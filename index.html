@@ -1,0 +1,2705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUPT Campus Food Photo Archive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .campus-section {
+            margin-bottom: 50px;
+        }
+        
+        .campus-title {
+            font-size: 2em;
+            color: #764ba2;
+            margin-bottom: 30px;
+            padding-left: 20px;
+            border-left: 5px solid #764ba2;
+        }
+        
+        .dining-hall {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .dining-hall-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .dish-section {
+            margin-bottom: 30px;
+        }
+        
+        .dish-title {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .photo-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+        }
+        
+        .photo-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+        
+        .photo-caption {
+            padding: 10px;
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            background: white;
+        }
+        
+        /* Lightbox styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        .lightbox.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .lightbox-close:hover {
+            color: #667eea;
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 20px;
+            user-select: none;
+            transition: color 0.3s;
+        }
+        
+        .lightbox-nav:hover {
+            color: #667eea;
+        }
+        
+        .lightbox-prev {
+            left: 20px;
+        }
+        
+        .lightbox-next {
+            right: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .photo-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .photo-item img {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍜 BUPT Campus Food Photo Archive</h1>
+            <p class="subtitle">北京邮电大学校园美食图片档案</p>
+            <div class="stats">
+                <div class="stat">📸 Total Photos: 304</div>
+                <div class="stat">🏫 Campuses: 1</div>
+                <div class="stat">🍽️ Dining Halls: 15</div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="campus-section">
+                <h2 class="campus-title">沙河校区</h2>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 TODO</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW1-TODO (2).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW1-TODO%20%282%29.jpg" alt="FW1-TODO (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-TODO (2).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW1-TODO.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW1-TODO.jpg" alt="FW1-TODO.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-TODO.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW4-TODO (1).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW4-TODO%20%281%29.jpg" alt="FW4-TODO (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-TODO (1).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW4-TODO (2).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW4-TODO%20%282%29.jpg" alt="FW4-TODO (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-TODO (2).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW4-TODO (3).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW4-TODO%20%283%29.jpg" alt="FW4-TODO (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-TODO (3).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW4-TODO.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW4-TODO.jpg" alt="FW4-TODO.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-TODO.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 FW5-TODO.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/FW5-TODO.jpg" alt="FW5-TODO.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW5-TODO.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 NQ2-TODO (2).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/NQ2-TODO%20%282%29.jpg" alt="NQ2-TODO (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ2-TODO (2).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 NQ2-TODO.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/NQ2-TODO.jpg" alt="NQ2-TODO.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ2-TODO.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 OUT-TODO (2).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/OUT-TODO%20%282%29.jpg" alt="OUT-TODO (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-TODO (2).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 OUT-TODO (3).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/OUT-TODO%20%283%29.jpg" alt="OUT-TODO (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-TODO (3).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 OUT-TODO.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/OUT-TODO.jpg" alt="OUT-TODO.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-TODO.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (1).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%281%29.jpg" alt="TODO-TODO (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (1).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (2) (1).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%282%29%20%281%29.jpg" alt="TODO-TODO (2) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (2) (1).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (2).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%282%29.jpg" alt="TODO-TODO (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (2).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (3).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%283%29.jpg" alt="TODO-TODO (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (3).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (4).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%284%29.jpg" alt="TODO-TODO (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (4).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (5).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%285%29.jpg" alt="TODO-TODO (5).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (5).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (6).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%286%29.jpg" alt="TODO-TODO (6).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (6).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (7).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%287%29.jpg" alt="TODO-TODO (7).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (7).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO (8).jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO%20%288%29.jpg" alt="TODO-TODO (8).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO (8).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-TODO.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-TODO.jpg" alt="TODO-TODO.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-TODO.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-不知道哪里的汤面.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E4%B8%8D%E7%9F%A5%E9%81%93%E5%93%AA%E9%87%8C%E7%9A%84%E6%B1%A4%E9%9D%A2.jpg" alt="TODO-不知道哪里的汤面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-不知道哪里的汤面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-双皮奶.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E5%8F%8C%E7%9A%AE%E5%A5%B6.jpg" alt="TODO-双皮奶.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-双皮奶.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-嗨族肉酱拌面.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E5%97%A8%E6%97%8F%E8%82%89%E9%85%B1%E6%8B%8C%E9%9D%A2.jpg" alt="TODO-嗨族肉酱拌面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-嗨族肉酱拌面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-基本伙.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E5%9F%BA%E6%9C%AC%E4%BC%99.jpg" alt="TODO-基本伙.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-基本伙.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-米线.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E7%B1%B3%E7%BA%BF.jpg" alt="TODO-米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-红烧肉盖饭.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E7%BA%A2%E7%83%A7%E8%82%89%E7%9B%96%E9%A5%AD.jpg" alt="TODO-红烧肉盖饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-红烧肉盖饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-肉蛋盖饭.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E8%82%89%E8%9B%8B%E7%9B%96%E9%A5%AD.jpg" alt="TODO-肉蛋盖饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-肉蛋盖饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-肉面.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E8%82%89%E9%9D%A2.jpg" alt="TODO-肉面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-肉面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-菜包子.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E8%8F%9C%E5%8C%85%E5%AD%90.jpg" alt="TODO-菜包子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-菜包子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-螺蛳粉.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E8%9E%BA%E8%9B%B3%E7%B2%89.jpg" alt="TODO-螺蛳粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-螺蛳粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-西红柿鸡蛋面.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E9%B8%A1%E8%9B%8B%E9%9D%A2.jpg" alt="TODO-西红柿鸡蛋面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-西红柿鸡蛋面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-锡纸水煮鱼.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E9%94%A1%E7%BA%B8%E6%B0%B4%E7%85%AE%E9%B1%BC.jpg" alt="TODO-锡纸水煮鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-锡纸水煮鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-骨汤麻辣烫.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E9%AA%A8%E6%B1%A4%E9%BA%BB%E8%BE%A3%E7%83%AB.jpg" alt="TODO-骨汤麻辣烫.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-骨汤麻辣烫.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-鱼排饭.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E9%B1%BC%E6%8E%92%E9%A5%AD.jpg" alt="TODO-鱼排饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-鱼排饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-鸡块拌面.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E9%B8%A1%E5%9D%97%E6%8B%8C%E9%9D%A2.jpg" alt="TODO-鸡块拌面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-鸡块拌面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-鸡排饭.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E9%B8%A1%E6%8E%92%E9%A5%AD.jpg" alt="TODO-鸡排饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-鸡排饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 TODO-麻辣烫.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/TODO-%E9%BA%BB%E8%BE%A3%E7%83%AB.jpg" alt="TODO-麻辣烫.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">TODO-麻辣烫.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 WM-TODO@爽.jpg</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/TODO/WM-TODO%40%E7%88%BD.jpg" alt="WM-TODO@爽.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-TODO@爽.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 其他</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 二维码广场关东煮</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%85%B6%E4%BB%96/%E4%BA%8C%E7%BB%B4%E7%A0%81%E5%B9%BF%E5%9C%BA%E5%85%B3%E4%B8%9C%E7%85%AE/OTH-%E4%BA%8C%E7%BB%B4%E7%A0%81%E5%B9%BF%E5%9C%BA%E5%85%B3%E4%B8%9C%E7%85%AE.jpg" alt="OTH-二维码广场关东煮.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OTH-二维码广场关东煮.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 椒麻鸡丝拌饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%85%B6%E4%BB%96/%E6%A4%92%E9%BA%BB%E9%B8%A1%E4%B8%9D%E6%8B%8C%E9%A5%AD/OTH-%E6%A4%92%E9%BA%BB%E9%B8%A1%E4%B8%9D%E6%8B%8C%E9%A5%AD.jpg" alt="OTH-椒麻鸡丝拌饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OTH-椒麻鸡丝拌饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 流心面包</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%85%B6%E4%BB%96/%E6%B5%81%E5%BF%83%E9%9D%A2%E5%8C%85/OTH-%E6%B5%81%E5%BF%83%E9%9D%A2%E5%8C%85.jpg" alt="OTH-流心面包.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OTH-流心面包.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣串串</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%85%B6%E4%BB%96/%E9%BA%BB%E8%BE%A3%E4%B8%B2%E4%B8%B2/OTH-%E9%BA%BB%E8%BE%A3%E4%B8%B2%E4%B8%B2.jpg" alt="OTH-麻辣串串.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OTH-麻辣串串.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 南区餐厅一层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 基本伙</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%9F%BA%E6%9C%AC%E4%BC%99/NQ1-%E5%9F%BA%E6%9C%AC%E4%BC%99%20%282%29.jpg" alt="NQ1-基本伙 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-基本伙 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%9F%BA%E6%9C%AC%E4%BC%99/NQ1-%E5%9F%BA%E6%9C%AC%E4%BC%99%20%283%29.jpg" alt="NQ1-基本伙 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-基本伙 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%9F%BA%E6%9C%AC%E4%BC%99/NQ1-%E5%9F%BA%E6%9C%AC%E4%BC%99%20%284%29.jpg" alt="NQ1-基本伙 (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-基本伙 (4).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%9F%BA%E6%9C%AC%E4%BC%99/NQ1-%E5%9F%BA%E6%9C%AC%E4%BC%99.jpg" alt="NQ1-基本伙.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-基本伙.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小龙虾</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%B0%8F%E9%BE%99%E8%99%BE/NQ1-%E5%B0%8F%E9%BE%99%E8%99%BE%20%282%29.jpg" alt="NQ1-小龙虾 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-小龙虾 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%B0%8F%E9%BE%99%E8%99%BE/NQ1-%E5%B0%8F%E9%BE%99%E8%99%BE.jpg" alt="NQ1-小龙虾.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-小龙虾.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 干拌面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%B9%B2%E6%8B%8C%E9%9D%A2/NQ1-%E6%AD%A6%E6%B1%89%E7%83%AD%E5%B9%B2%E9%9D%A2.jpg" alt="NQ1-武汉热干面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-武汉热干面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 火鸡烤冷面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%81%AB%E9%B8%A1%E7%83%A4%E5%86%B7%E9%9D%A2/NQ1-%E7%81%AB%E9%B8%A1%E7%83%A4%E5%86%B7%E9%9D%A2%20%282%29.jpg" alt="NQ1-火鸡烤冷面 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-火鸡烤冷面 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%81%AB%E9%B8%A1%E7%83%A4%E5%86%B7%E9%9D%A2/NQ1-%E7%81%AB%E9%B8%A1%E7%83%A4%E5%86%B7%E9%9D%A2%20%283%29.jpg" alt="NQ1-火鸡烤冷面 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-火鸡烤冷面 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%81%AB%E9%B8%A1%E7%83%A4%E5%86%B7%E9%9D%A2/NQ1-%E7%81%AB%E9%B8%A1%E7%83%A4%E5%86%B7%E9%9D%A2.jpg" alt="NQ1-火鸡烤冷面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ1-火鸡烤冷面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 南区餐厅二层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 炒饭炒面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%82%92%E9%A5%AD%E7%82%92%E9%9D%A2/NQ2-%E7%82%92%E9%A5%AD%E7%82%92%E9%9D%A2.jpg" alt="NQ2-炒饭炒面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ2-炒饭炒面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 肉汁盖米饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%82%89%E6%B1%81%E7%9B%96%E7%B1%B3%E9%A5%AD/NQ2-%E8%82%89%E6%B1%81%E7%9B%96%E7%B1%B3%E9%A5%AD.jpg" alt="NQ2-肉汁盖米饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ2-肉汁盖米饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 蒸饺</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%92%B8%E9%A5%BA/NQ2-%E8%92%B8%E9%A5%BA.jpg" alt="NQ2-蒸饺.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ2-蒸饺.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 饺子</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%8D%97%E5%8C%BA%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%A5%BA%E5%AD%90/NQ2-%E9%A5%BA%E5%AD%90.jpg" alt="NQ2-饺子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">NQ2-饺子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 外卖</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 三米粥</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E4%B8%89%E7%B1%B3%E7%B2%A5/WM-%E4%B8%89%E7%B1%B3%E7%B2%A5.jpg" alt="WM-三米粥.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-三米粥.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 啵啵鱼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%95%B5%E5%95%B5%E9%B1%BC/WM-%E5%95%B5%E5%95%B5%E9%B1%BC.jpg" alt="WM-啵啵鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-啵啵鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 喜茶</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%96%9C%E8%8C%B6/WM-%E5%96%9C%E8%8C%B6.jpg" alt="WM-喜茶.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-喜茶.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 大大大桶奶茶</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%A4%A7%E5%A4%A7%E5%A4%A7%E6%A1%B6%E5%A5%B6%E8%8C%B6/WM-%E5%A4%A7%E5%A4%A7%E5%A4%A7%E6%A1%B6%E5%A5%B6%E8%8C%B6.jpg" alt="WM-大大大桶奶茶.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-大大大桶奶茶.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 大桶奶茶和果茶</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%A4%A7%E6%A1%B6%E5%A5%B6%E8%8C%B6%E5%92%8C%E6%9E%9C%E8%8C%B6/WM-%E5%A4%A7%E6%A1%B6%E5%A5%B6%E8%8C%B6%E5%92%8C%E6%9E%9C%E8%8C%B6.jpg" alt="WM-大桶奶茶和果茶.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-大桶奶茶和果茶.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 尊宝披萨</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%B0%8A%E5%AE%9D%E6%8A%AB%E8%90%A8/WM-%E5%B0%8A%E5%AE%9D%E6%8A%AB%E8%90%A8.jpg" alt="WM-尊宝披萨.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-尊宝披萨.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%B0%8F%E8%9B%8B%E7%B3%95/WM-%E5%B0%8F%E8%9B%8B%E7%B3%95.jpg" alt="WM-小蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-小蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 必胜客小蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E5%BF%85%E8%83%9C%E5%AE%A2%E5%B0%8F%E8%9B%8B%E7%B3%95/WM-%E5%BF%85%E8%83%9C%E5%AE%A2%E5%B0%8F%E8%9B%8B%E7%B3%95.jpg" alt="WM-必胜客小蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-必胜客小蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 杯子蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E6%9D%AF%E5%AD%90%E8%9B%8B%E7%B3%95/WM-%E6%9D%AF%E5%AD%90%E8%9B%8B%E7%B3%95%20%282%29.jpg" alt="WM-杯子蛋糕 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-杯子蛋糕 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E6%9D%AF%E5%AD%90%E8%9B%8B%E7%B3%95/WM-%E6%9D%AF%E5%AD%90%E8%9B%8B%E7%B3%95.jpg" alt="WM-杯子蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-杯子蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 果切</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E6%9E%9C%E5%88%87/WM-%E6%9E%9C%E5%88%87.jpg" alt="WM-果切.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-果切.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海鲜炒饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E6%B5%B7%E9%B2%9C%E7%82%92%E9%A5%AD/WM-%E6%B5%B7%E9%B2%9C%E7%82%92%E9%A5%AD.jpg" alt="WM-海鲜炒饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-海鲜炒饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海鲜炒饭加肠</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E6%B5%B7%E9%B2%9C%E7%82%92%E9%A5%AD%E5%8A%A0%E8%82%A0/WM-%E6%B5%B7%E9%B2%9C%E7%82%92%E9%A5%AD%E5%8A%A0%E8%82%A0.jpg" alt="WM-海鲜炒饭加肠.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-海鲜炒饭加肠.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤串和小龙虾</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E7%83%A4%E4%B8%B2%E5%92%8C%E5%B0%8F%E9%BE%99%E8%99%BE/WM-%E7%83%A4%E4%B8%B2%E5%92%8C%E5%B0%8F%E9%BE%99%E8%99%BE.jpg" alt="WM-烤串和小龙虾.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-烤串和小龙虾.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烧烤串</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E7%83%A7%E7%83%A4%E4%B8%B2/WM-%E7%83%A7%E7%83%A4%E4%B8%B2.jpg" alt="WM-烧烤串.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-烧烤串.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 生日蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E7%94%9F%E6%97%A5%E8%9B%8B%E7%B3%95/WM-%E7%94%9F%E6%97%A5%E8%9B%8B%E7%B3%95.jpg" alt="WM-生日蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-生日蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 生煎和拌粉和水煮鱼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E7%94%9F%E7%85%8E%E5%92%8C%E6%8B%8C%E7%B2%89%E5%92%8C%E6%B0%B4%E7%85%AE%E9%B1%BC/WM-%E7%94%9F%E7%85%8E%E5%92%8C%E6%8B%8C%E7%B2%89%E5%92%8C%E6%B0%B4%E7%85%AE%E9%B1%BC.jpg" alt="WM-生煎和拌粉和水煮鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-生煎和拌粉和水煮鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 花小小新疆炒米粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E8%8A%B1%E5%B0%8F%E5%B0%8F%E6%96%B0%E7%96%86%E7%82%92%E7%B1%B3%E7%B2%89/WM-%E8%8A%B1%E5%B0%8F%E5%B0%8F%E6%96%B0%E7%96%86%E7%82%92%E7%B1%B3%E7%B2%89%20%282%29.jpg" alt="WM-花小小新疆炒米粉 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-花小小新疆炒米粉 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E8%8A%B1%E5%B0%8F%E5%B0%8F%E6%96%B0%E7%96%86%E7%82%92%E7%B1%B3%E7%B2%89/WM-%E8%8A%B1%E5%B0%8F%E5%B0%8F%E6%96%B0%E7%96%86%E7%82%92%E7%B1%B3%E7%B2%89%20%283%29.jpg" alt="WM-花小小新疆炒米粉 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-花小小新疆炒米粉 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E8%8A%B1%E5%B0%8F%E5%B0%8F%E6%96%B0%E7%96%86%E7%82%92%E7%B1%B3%E7%B2%89/WM-%E8%8A%B1%E5%B0%8F%E5%B0%8F%E6%96%B0%E7%96%86%E7%82%92%E7%B1%B3%E7%B2%89.jpg" alt="WM-花小小新疆炒米粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-花小小新疆炒米粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 草莓和桑葚</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E8%8D%89%E8%8E%93%E5%92%8C%E6%A1%91%E8%91%9A/WM-%E8%8D%89%E8%8E%93%E5%92%8C%E6%A1%91%E8%91%9A.jpg" alt="WM-草莓和桑葚.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-草莓和桑葚.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E8%9B%8B%E7%B3%95/WM-%E8%9B%8B%E7%B3%95%20%282%29.jpg" alt="WM-蛋糕 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-蛋糕 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E8%9B%8B%E7%B3%95/WM-%E8%9B%8B%E7%B3%95.jpg" alt="WM-蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 韩罗苑</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E9%9F%A9%E7%BD%97%E8%8B%91/WM-%E9%9F%A9%E7%BD%97%E8%8B%91.jpg" alt="WM-韩罗苑.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-韩罗苑.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 驴肉火烧</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E5%A4%96%E5%8D%96/%E9%A9%B4%E8%82%89%E7%81%AB%E7%83%A7/WM-%E9%A9%B4%E8%82%89%E7%81%AB%E7%83%A7.jpg" alt="WM-驴肉火烧.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">WM-驴肉火烧.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 教工餐厅一层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 F+叉烧饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/F%2B%E5%8F%89%E7%83%A7%E9%A5%AD/JG1-F%2B%E5%8F%89%E7%83%A7%E9%A5%AD.jpg" alt="JG1-F+叉烧饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-F+叉烧饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 冰淇淋</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%86%B0%E6%B7%87%E6%B7%8B/JG1-%E5%86%B0%E6%B7%87%E6%B7%8B.jpg" alt="JG1-冰淇淋.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-冰淇淋.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 土豆牛肉盖饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%E7%9B%96%E9%A5%AD/JG1-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%E7%9B%96%E9%A5%AD.jpg" alt="JG1-土豆牛肉盖饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-土豆牛肉盖饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 汤泡饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E6%B1%A4%E6%B3%A1%E9%A5%AD/JG1-%E6%B1%A4%E6%B3%A1%E9%A5%AD.jpg" alt="JG1-汤泡饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-汤泡饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤冷面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E5%86%B7%E9%9D%A2/JG1-%E7%83%A4%E5%86%B7%E9%9D%A2.jpg" alt="JG1-烤冷面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-烤冷面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 状元鸡煲饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%8A%B6%E5%85%83%E9%B8%A1%E7%85%B2%E9%A5%AD/JG1-%E7%8A%B6%E5%85%83%E9%B8%A1%E7%85%B2%E9%A5%AD.jpg" alt="JG1-状元鸡煲饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-状元鸡煲饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 螺蛳粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E8%9E%BA%E8%9B%B3%E7%B2%89/JG1-%E8%9E%BA%E8%9B%B3%E7%B2%89.jpg" alt="JG1-螺蛳粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-螺蛳粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 锅贴</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E9%94%85%E8%B4%B4/JG1-%E9%94%85%E8%B4%B4.jpg" alt="JG1-锅贴.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-锅贴.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡腿煲饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E9%B8%A1%E8%85%BF%E7%85%B2%E9%A5%AD/JG1-%E9%B8%A1%E8%85%BF%E7%85%B2%E9%A5%AD.jpg" alt="JG1-鸡腿煲饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG1-鸡腿煲饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 教工餐厅二层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 巨大甜筒</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E5%B7%A8%E5%A4%A7%E7%94%9C%E7%AD%92/JG2-%E5%B7%A8%E5%A4%A7%E7%94%9C%E7%AD%92.jpg" alt="JG2-巨大甜筒.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-巨大甜筒.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 拌粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E6%8B%8C%E7%B2%89/JG2-%E6%8B%8C%E7%B2%89%20%282%29.jpg" alt="JG2-拌粉 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-拌粉 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E6%8B%8C%E7%B2%89/JG2-%E6%8B%8C%E7%B2%89.jpg" alt="JG2-拌粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-拌粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 淮南牛肉汤</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E6%B7%AE%E5%8D%97%E7%89%9B%E8%82%89%E6%B1%A4/JG2-%E6%B7%AE%E5%8D%97%E7%89%9B%E8%82%89%E6%B1%A4.jpg" alt="JG2-淮南牛肉汤.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-淮南牛肉汤.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 滑蛋牛肉盖饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E6%BB%91%E8%9B%8B%E7%89%9B%E8%82%89%E7%9B%96%E9%A5%AD/JG2-%E6%BB%91%E8%9B%8B%E7%89%9B%E8%82%89%E7%9B%96%E9%A5%AD.jpg" alt="JG2-滑蛋牛肉盖饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-滑蛋牛肉盖饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 炒面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%82%92%E9%9D%A2/JG2-%E7%82%92%E9%9D%A2.jpg" alt="JG2-炒面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-炒面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 米线</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%B1%B3%E7%BA%BF/JG2-%E7%B1%B3%E7%BA%BF%20%281%29.jpg" alt="JG2-米线 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-米线 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%B1%B3%E7%BA%BF/JG2-%E7%B1%B3%E7%BA%BF%20%282%29.jpg" alt="JG2-米线 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-米线 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%B1%B3%E7%BA%BF/JG2-%E7%B1%B3%E7%BA%BF%20%283%29.jpg" alt="JG2-米线 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-米线 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%B1%B3%E7%BA%BF/JG2-%E7%B1%B3%E7%BA%BF%20%284%29.jpg" alt="JG2-米线 (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-米线 (4).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%B1%B3%E7%BA%BF/JG2-%E7%B1%B3%E7%BA%BF.jpg" alt="JG2-米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 肥牛米线</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%82%A5%E7%89%9B%E7%B1%B3%E7%BA%BF/JG2-%E8%82%A5%E7%89%9B%E7%B1%B3%E7%BA%BF.jpg" alt="JG2-肥牛米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-肥牛米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 自选菜</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C/JG2-%E8%87%AA%E9%80%89%E8%8F%9C.jpg" alt="JG2-自选菜.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-自选菜.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 菌汤米线</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%8F%8C%E6%B1%A4%E7%B1%B3%E7%BA%BF/JG2-%E8%8F%8C%E6%B1%A4%E7%B1%B3%E7%BA%BF.jpg" alt="JG2-菌汤米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-菌汤米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 金汤肥牛米线</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%87%91%E6%B1%A4%E8%82%A5%E7%89%9B%E7%B1%B3%E7%BA%BF/JG2-%E9%87%91%E6%B1%A4%E8%82%A5%E7%89%9B%E7%B1%B3%E7%BA%BF.jpg" alt="JG2-金汤肥牛米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-金汤肥牛米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡块面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%B8%A1%E5%9D%97%E9%9D%A2/JG2-%E9%B8%A1%E5%9D%97%E9%9D%A2%20%282%29.jpg" alt="JG2-鸡块面 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-鸡块面 (2).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣烫</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%BA%BB%E8%BE%A3%E7%83%AB/JG2-%E9%BA%BB%E8%BE%A3%E7%83%AB.jpg" alt="JG2-麻辣烫.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG2-麻辣烫.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 教工餐厅五层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 乌冬面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E4%B9%8C%E5%86%AC%E9%9D%A2/JG5-%E4%B9%8C%E5%86%AC%E9%9D%A2.jpg" alt="JG5-乌冬面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-乌冬面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 五谷鱼粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E4%BA%94%E8%B0%B7%E9%B1%BC%E7%B2%89/JG5-%E4%BA%94%E8%B0%B7%E9%B1%BC%E7%B2%89.jpg" alt="JG5-五谷鱼粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-五谷鱼粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 土豆牛肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%20%281%29.jpg" alt="JG5-土豆牛肉 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%20%282%29%20%281%29.jpg" alt="JG5-土豆牛肉 (2) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉 (2) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%20%282%29.jpg" alt="JG5-土豆牛肉 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%20%283%29.jpg" alt="JG5-土豆牛肉 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89.jpg" alt="JG5-土豆牛肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 土豆牛肉外卖</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%E5%A4%96%E5%8D%96/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%E5%A4%96%E5%8D%96%20%281%29.jpg" alt="JG5-土豆牛肉外卖 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉外卖 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%E5%A4%96%E5%8D%96/JG5-%E5%9C%9F%E8%B1%86%E7%89%9B%E8%82%89%E5%A4%96%E5%8D%96.jpg" alt="JG5-土豆牛肉外卖.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-土豆牛肉外卖.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 大酱汤</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%A4%A7%E9%85%B1%E6%B1%A4/JG5-%E5%A4%A7%E9%85%B1%E6%B1%A4%20%281%29.jpg" alt="JG5-大酱汤 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-大酱汤 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%A4%A7%E9%85%B1%E6%B1%A4/JG5-%E5%A4%A7%E9%85%B1%E6%B1%A4.jpg" alt="JG5-大酱汤.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-大酱汤.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 山东煎饼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%B1%B1%E4%B8%9C%E7%85%8E%E9%A5%BC/JG5-%E5%B1%B1%E4%B8%9C%E7%85%8E%E9%A5%BC.jpg" alt="JG5-山东煎饼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-山东煎饼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 广式烧腊鸡腿饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E5%B9%BF%E5%BC%8F%E7%83%A7%E8%85%8A%E9%B8%A1%E8%85%BF%E9%A5%AD/JG5-%E5%B9%BF%E5%BC%8F%E7%83%A7%E8%85%8A%E9%B8%A1%E8%85%BF%E9%A5%AD.jpg" alt="JG5-广式烧腊鸡腿饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-广式烧腊鸡腿饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 意大利面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%84%8F%E5%A4%A7%E5%88%A9%E9%9D%A2/JG5-%E6%84%8F%E5%A4%A7%E5%88%A9%E9%9D%A2.jpg" alt="JG5-意大利面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-意大利面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 早餐</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%97%A9%E9%A4%90/JG5-%E6%97%A9%E9%A4%90.jpg" alt="JG5-早餐.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-早餐.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 朝鲜冷面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%9C%9D%E9%B2%9C%E5%86%B7%E9%9D%A2/JG5-%E6%9C%9D%E9%B2%9C%E5%86%B7%E9%9D%A2.jpg" alt="JG5-朝鲜冷面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-朝鲜冷面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 水煮鱼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%B0%B4%E7%85%AE%E9%B1%BC/JG5-%E6%B0%B4%E7%85%AE%E9%B1%BC%20%281%29.jpg" alt="JG5-水煮鱼 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-水煮鱼 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%B0%B4%E7%85%AE%E9%B1%BC/JG5-%E6%B0%B4%E7%85%AE%E9%B1%BC.jpg" alt="JG5-水煮鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-水煮鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海鲜汤面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%B5%B7%E9%B2%9C%E6%B1%A4%E9%9D%A2/JG5-%E6%B5%B7%E9%B2%9C%E6%B1%A4%E9%9D%A2.jpg" alt="JG5-海鲜汤面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-海鲜汤面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海鲜炒面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%B5%B7%E9%B2%9C%E7%82%92%E9%9D%A2/JG5-%E6%B5%B7%E9%B2%9C%E7%82%92%E9%9D%A2.jpg" alt="JG5-海鲜炒面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-海鲜炒面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海鲜炒饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%B5%B7%E9%B2%9C%E7%82%92%E9%A5%AD/JG5-%E6%B5%B7%E9%B2%9C%E7%82%92%E9%A5%AD.jpg" alt="JG5-海鲜炒饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-海鲜炒饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海鲜面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E6%B5%B7%E9%B2%9C%E9%9D%A2/JG5-%E6%B5%B7%E9%B2%9C%E9%9D%A2.jpg" alt="JG5-海鲜面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-海鲜面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 煎饼果子</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%85%8E%E9%A5%BC%E6%9E%9C%E5%AD%90/JG5-%E7%85%8E%E9%A5%BC%E6%9E%9C%E5%AD%90%20%282%29.jpg" alt="JG5-煎饼果子 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-煎饼果子 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%85%8E%E9%A5%BC%E6%9E%9C%E5%AD%90/JG5-%E7%85%8E%E9%A5%BC%E6%9E%9C%E5%AD%90.jpg" alt="JG5-煎饼果子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-煎饼果子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 紫菜包饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%B4%AB%E8%8F%9C%E5%8C%85%E9%A5%AD/JG5-%E7%B4%AB%E8%8F%9C%E5%8C%85%E9%A5%AD%20%281%29.jpg" alt="JG5-紫菜包饭 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-紫菜包饭 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%B4%AB%E8%8F%9C%E5%8C%85%E9%A5%AD/JG5-%E7%B4%AB%E8%8F%9C%E5%8C%85%E9%A5%AD%20%282%29.jpg" alt="JG5-紫菜包饭 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-紫菜包饭 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%B4%AB%E8%8F%9C%E5%8C%85%E9%A5%AD/JG5-%E7%B4%AB%E8%8F%9C%E5%8C%85%E9%A5%AD.jpg" alt="JG5-紫菜包饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-紫菜包饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 腊肠炒饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%85%8A%E8%82%A0%E7%82%92%E9%A5%AD/JG5-%E8%85%8A%E8%82%A0%E7%82%92%E9%A5%AD.jpg" alt="JG5-腊肠炒饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-腊肠炒饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 自助餐</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%281%29.jpg" alt="JG5-自助餐 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%2810%29.jpg" alt="JG5-自助餐 (10).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (10).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%2811%29.jpg" alt="JG5-自助餐 (11).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (11).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%282%29%20%281%29.jpg" alt="JG5-自助餐 (2) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (2) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%282%29.jpg" alt="JG5-自助餐 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%283%29%20%281%29.jpg" alt="JG5-自助餐 (3) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (3) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%283%29.jpg" alt="JG5-自助餐 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%284%29%20%281%29.jpg" alt="JG5-自助餐 (4) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (4) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%284%29.jpg" alt="JG5-自助餐 (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (4).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%285%29%20%281%29.jpg" alt="JG5-自助餐 (5) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (5) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%285%29.jpg" alt="JG5-自助餐 (5).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (5).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%286%29%20%281%29.jpg" alt="JG5-自助餐 (6) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (6) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%286%29.jpg" alt="JG5-自助餐 (6).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (6).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%287%29.jpg" alt="JG5-自助餐 (7).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (7).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%288%29.jpg" alt="JG5-自助餐 (8).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (8).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%20%289%29.jpg" alt="JG5-自助餐 (9).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐 (9).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90.jpg" alt="JG5-自助餐.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 自助餐大肉丸</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%87%AA%E5%8A%A9%E9%A4%90%E5%A4%A7%E8%82%89%E4%B8%B8/JG5-%E8%87%AA%E5%8A%A9%E9%A4%90%E5%A4%A7%E8%82%89%E4%B8%B8.jpg" alt="JG5-自助餐大肉丸.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-自助餐大肉丸.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 螺狮粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%9E%BA%E7%8B%AE%E7%B2%89/JG5-%E8%9E%BA%E7%8B%AE%E7%B2%89.jpg" alt="JG5-螺狮粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-螺狮粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 西红柿牛腩</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9/JG5-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9%20%281%29.jpg" alt="JG5-西红柿牛腩 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-西红柿牛腩 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9/JG5-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9%20%282%29%20%281%29.jpg" alt="JG5-西红柿牛腩 (2) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-西红柿牛腩 (2) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9/JG5-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9%20%282%29.jpg" alt="JG5-西红柿牛腩 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-西红柿牛腩 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9/JG5-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9%20%283%29%20%281%29.jpg" alt="JG5-西红柿牛腩 (3) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-西红柿牛腩 (3) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9/JG5-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9%20%283%29.jpg" alt="JG5-西红柿牛腩 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-西红柿牛腩 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9/JG5-%E8%A5%BF%E7%BA%A2%E6%9F%BF%E7%89%9B%E8%85%A9.jpg" alt="JG5-西红柿牛腩.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-西红柿牛腩.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 金针菇肥牛</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%87%91%E9%92%88%E8%8F%87%E8%82%A5%E7%89%9B/JG5-%E9%87%91%E9%92%88%E8%8F%87%E8%82%A5%E7%89%9B.jpg" alt="JG5-金针菇肥牛.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-金针菇肥牛.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 铁板剁椒鸡蛋</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%93%81%E6%9D%BF%E5%89%81%E6%A4%92%E9%B8%A1%E8%9B%8B/JG5-%E9%93%81%E6%9D%BF%E5%89%81%E6%A4%92%E9%B8%A1%E8%9B%8B.jpg" alt="JG5-铁板剁椒鸡蛋.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-铁板剁椒鸡蛋.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 铁板咖喱牛肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%93%81%E6%9D%BF%E5%92%96%E5%96%B1%E7%89%9B%E8%82%89/JG5-%E9%93%81%E6%9D%BF%E5%92%96%E5%96%B1%E7%89%9B%E8%82%89.jpg" alt="JG5-铁板咖喱牛肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-铁板咖喱牛肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 铁板洋葱炒肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%93%81%E6%9D%BF%E6%B4%8B%E8%91%B1%E7%82%92%E8%82%89/JG5-%E9%93%81%E6%9D%BF%E6%B4%8B%E8%91%B1%E7%82%92%E8%82%89.jpg" alt="JG5-铁板洋葱炒肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-铁板洋葱炒肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 铁板鸡蛋</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%93%81%E6%9D%BF%E9%B8%A1%E8%9B%8B/JG5-%E9%93%81%E6%9D%BF%E9%B8%A1%E8%9B%8B.jpg" alt="JG5-铁板鸡蛋.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-铁板鸡蛋.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 韩式传统拌饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%9F%A9%E5%BC%8F%E4%BC%A0%E7%BB%9F%E6%8B%8C%E9%A5%AD/JG5-%E9%9F%A9%E5%BC%8F%E4%BC%A0%E7%BB%9F%E6%8B%8C%E9%A5%AD.jpg" alt="JG5-韩式传统拌饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-韩式传统拌饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鱼扒饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%B1%BC%E6%89%92%E9%A5%AD/JG5-%E9%B1%BC%E6%89%92%E9%A5%AD.jpg" alt="JG5-鱼扒饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-鱼扒饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鱿鱼炒饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%B1%BF%E9%B1%BC%E7%82%92%E9%A5%AD/JG5-%E9%B1%BF%E9%B1%BC%E7%82%92%E9%A5%AD%20.jpg" alt="JG5-鱿鱼炒饭 .jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-鱿鱼炒饭 .jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡扒饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%B8%A1%E6%89%92%E9%A5%AD/JG5-%E9%B8%A1%E6%89%92%E9%A5%AD.jpg" alt="JG5-鸡扒饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-鸡扒饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡腿饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%B8%A1%E8%85%BF%E9%A5%AD/JG5-%E9%B8%A1%E8%85%BF%E9%A5%AD.jpg" alt="JG5-鸡腿饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-鸡腿饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣烫</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%BA%BB%E8%BE%A3%E7%83%AB/JG5-%E9%BA%BB%E8%BE%A3%E7%83%AB.jpg" alt="JG5-麻辣烫.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-麻辣烫.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 黑胡椒意大利面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%BB%91%E8%83%A1%E6%A4%92%E6%84%8F%E5%A4%A7%E5%88%A9%E9%9D%A2/JG5-%E9%BB%91%E8%83%A1%E6%A4%92%E6%84%8F%E5%A4%A7%E5%88%A9%E9%9D%A2.jpg" alt="JG5-黑胡椒意大利面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG5-黑胡椒意大利面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 教工餐厅四层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 内脏面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E5%86%85%E8%84%8F%E9%9D%A2/JG4-%E5%86%85%E8%84%8F%E9%9D%A2.jpg" alt="JG4-内脏面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-内脏面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 土豆鸡块拌面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E5%9C%9F%E8%B1%86%E9%B8%A1%E5%9D%97%E6%8B%8C%E9%9D%A2/JG4-%E5%9C%9F%E8%B1%86%E9%B8%A1%E5%9D%97%E6%8B%8C%E9%9D%A2.jpg" alt="JG4-土豆鸡块拌面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-土豆鸡块拌面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 水煮肥牛</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E6%B0%B4%E7%85%AE%E8%82%A5%E7%89%9B/JG4-%E6%B0%B4%E7%85%AE%E8%82%A5%E7%89%9B%20%281%29.jpg" alt="JG4-水煮肥牛 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-水煮肥牛 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E6%B0%B4%E7%85%AE%E8%82%A5%E7%89%9B/JG4-%E6%B0%B4%E7%85%AE%E8%82%A5%E7%89%9B.jpg" alt="JG4-水煮肥牛.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-水煮肥牛.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 水煮鱼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E6%B0%B4%E7%85%AE%E9%B1%BC/JG4-%E6%B0%B4%E7%85%AE%E9%B1%BC%20%281%29.jpg" alt="JG4-水煮鱼 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-水煮鱼 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E6%B0%B4%E7%85%AE%E9%B1%BC/JG4-%E6%B0%B4%E7%85%AE%E9%B1%BC%20%282%29.jpg" alt="JG4-水煮鱼 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-水煮鱼 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E6%B0%B4%E7%85%AE%E9%B1%BC/JG4-%E6%B0%B4%E7%85%AE%E9%B1%BC.jpg" alt="JG4-水煮鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-水煮鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 牛杂面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E7%89%9B%E6%9D%82%E9%9D%A2/JG4-%E7%89%9B%E6%9D%82%E9%9D%A2.jpg" alt="JG4-牛杂面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-牛杂面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 花甲粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E8%8A%B1%E7%94%B2%E7%B2%89/JG4-%E8%8A%B1%E7%94%B2%E7%B2%89.jpg" alt="JG4-花甲粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-花甲粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 锡纸花甲粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%94%A1%E7%BA%B8%E8%8A%B1%E7%94%B2%E7%B2%89/JG4-%E9%94%A1%E7%BA%B8%E8%8A%B1%E7%94%B2%E7%B2%89.jpg" alt="JG4-锡纸花甲粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-锡纸花甲粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡块刀削面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B8%A1%E5%9D%97%E5%88%80%E5%89%8A%E9%9D%A2/JG4-%E9%B8%A1%E5%9D%97%E5%88%80%E5%89%8A%E9%9D%A2.jpg" alt="JG4-鸡块刀削面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-鸡块刀削面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡块小面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B8%A1%E5%9D%97%E5%B0%8F%E9%9D%A2/JG4-%E9%B8%A1%E5%9D%97%E5%B0%8F%E9%9D%A2.jpg" alt="JG4-鸡块小面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-鸡块小面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡块面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B8%A1%E5%9D%97%E9%9D%A2/JG4-%E9%B8%A1%E5%9D%97%E9%9D%A2%20%283%29.jpg" alt="JG4-鸡块面 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-鸡块面 (3).jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡蛋仔冰淇淋</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B8%A1%E8%9B%8B%E4%BB%94%E5%86%B0%E6%B7%87%E6%B7%8B/JG4-%E9%B8%A1%E8%9B%8B%E4%BB%94%E5%86%B0%E6%B7%87%E6%B7%8B.jpg" alt="JG4-鸡蛋仔冰淇淋.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-鸡蛋仔冰淇淋.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡蛋仔甜筒</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B8%A1%E8%9B%8B%E4%BB%94%E7%94%9C%E7%AD%92/JG4-%E9%B8%A1%E8%9B%8B%E4%BB%94%E7%94%9C%E7%AD%92.jpg" alt="JG4-鸡蛋仔甜筒.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-鸡蛋仔甜筒.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣拌</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%BA%BB%E8%BE%A3%E6%8B%8C/JG4-%E9%BA%BB%E8%BE%A3%E6%8B%8C.jpg" alt="JG4-麻辣拌.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-麻辣拌.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣烫</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%BA%BB%E8%BE%A3%E7%83%AB/JG4-%E9%BA%BB%E8%BE%A3%E7%83%AB%20%281%29.jpg" alt="JG4-麻辣烫 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-麻辣烫 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%95%99%E5%B7%A5%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%BA%BB%E8%BE%A3%E7%83%AB/JG4-%E9%BA%BB%E8%BE%A3%E7%83%AB.jpg" alt="JG4-麻辣烫.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">JG4-麻辣烫.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 校外美食</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 一品闷锅</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E4%B8%80%E5%93%81%E9%97%B7%E9%94%85/OUT-%E4%B8%80%E5%93%81%E9%97%B7%E9%94%85.jpg" alt="OUT-一品闷锅.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-一品闷锅.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 三明治沙拉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E4%B8%89%E6%98%8E%E6%B2%BB%E6%B2%99%E6%8B%89/OUT-%E4%B8%89%E6%98%8E%E6%B2%BB%E6%B2%99%E6%8B%89.jpg" alt="OUT-三明治沙拉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-三明治沙拉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 京酱肉丝</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E4%BA%AC%E9%85%B1%E8%82%89%E4%B8%9D/OUT-%E4%BA%AC%E9%85%B1%E8%82%89%E4%B8%9D.jpg" alt="OUT-京酱肉丝.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-京酱肉丝.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 味多美蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%91%B3%E5%A4%9A%E7%BE%8E%E8%9B%8B%E7%B3%95/OUT-%E5%91%B3%E5%A4%9A%E7%BE%8E%E8%9B%8B%E7%B3%95.jpg" alt="OUT-味多美蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-味多美蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 呷哺呷哺</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA/OUT-%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA%20%282%29.jpg" alt="OUT-呷哺呷哺 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-呷哺呷哺 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA/OUT-%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA%20%283%29.jpg" alt="OUT-呷哺呷哺 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-呷哺呷哺 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA/OUT-%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA.jpg" alt="OUT-呷哺呷哺.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-呷哺呷哺.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 呷哺呷哺糍粑</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA%E7%B3%8D%E7%B2%91/OUT-%E5%91%B7%E5%93%BA%E5%91%B7%E5%93%BA%E7%B3%8D%E7%B2%91.jpg" alt="OUT-呷哺呷哺糍粑.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-呷哺呷哺糍粑.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 呷脯呷脯火锅</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%91%B7%E8%84%AF%E5%91%B7%E8%84%AF%E7%81%AB%E9%94%85/OUT-%E5%91%B7%E8%84%AF%E5%91%B7%E8%84%AF%E7%81%AB%E9%94%85.jpg" alt="OUT-呷脯呷脯火锅.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-呷脯呷脯火锅.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 咖啡厅意面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%92%96%E5%95%A1%E5%8E%85%E6%84%8F%E9%9D%A2/OUT-%E5%92%96%E5%95%A1%E5%8E%85%E6%84%8F%E9%9D%A2.jpg" alt="OUT-咖啡厅意面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-咖啡厅意面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小贝壳油炸大虾</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%B0%8F%E8%B4%9D%E5%A3%B3%E6%B2%B9%E7%82%B8%E5%A4%A7%E8%99%BE/OUT-%E5%B0%8F%E8%B4%9D%E5%A3%B3%E6%B2%B9%E7%82%B8%E5%A4%A7%E8%99%BE.jpg" alt="OUT-小贝壳油炸大虾.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-小贝壳油炸大虾.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小贝壳芳香排骨</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%B0%8F%E8%B4%9D%E5%A3%B3%E8%8A%B3%E9%A6%99%E6%8E%92%E9%AA%A8/OUT-%E5%B0%8F%E8%B4%9D%E5%A3%B3%E8%8A%B3%E9%A6%99%E6%8E%92%E9%AA%A8.jpg" alt="OUT-小贝壳芳香排骨.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-小贝壳芳香排骨.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小麦铺丸子</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%B0%8F%E9%BA%A6%E9%93%BA%E4%B8%B8%E5%AD%90/OUT-%E5%B0%8F%E9%BA%A6%E9%93%BA%E4%B8%B8%E5%AD%90.jpg" alt="OUT-小麦铺丸子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-小麦铺丸子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 干拌面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E5%B9%B2%E6%8B%8C%E9%9D%A2/OUT-%E5%B9%B2%E6%8B%8C%E9%9D%A2.jpg" alt="OUT-干拌面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-干拌面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 悦荟餐厅</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%82%A6%E8%8D%9F%E9%A4%90%E5%8E%85/OUT-%E6%82%A6%E8%8D%9F%E9%A4%90%E5%8E%85.jpg" alt="OUT-悦荟餐厅.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-悦荟餐厅.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 提子</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%8F%90%E5%AD%90/OUT-%E6%8F%90%E5%AD%90.jpg" alt="OUT-提子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-提子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 星巴克小蛋糕</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%98%9F%E5%B7%B4%E5%85%8B%E5%B0%8F%E8%9B%8B%E7%B3%95/OUT-%E6%98%9F%E5%B7%B4%E5%85%8B%E5%B0%8F%E8%9B%8B%E7%B3%95%20%281%29.jpg" alt="OUT-星巴克小蛋糕 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-星巴克小蛋糕 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%98%9F%E5%B7%B4%E5%85%8B%E5%B0%8F%E8%9B%8B%E7%B3%95/OUT-%E6%98%9F%E5%B7%B4%E5%85%8B%E5%B0%8F%E8%9B%8B%E7%B3%95.jpg" alt="OUT-星巴克小蛋糕.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-星巴克小蛋糕.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 校内鸡尾酒</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%A0%A1%E5%86%85%E9%B8%A1%E5%B0%BE%E9%85%92/OUT-%E6%A0%A1%E5%86%85%E9%B8%A1%E5%B0%BE%E9%85%92.jpg" alt="OUT-校内鸡尾酒.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-校内鸡尾酒.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 汉堡王</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B1%89%E5%A0%A1%E7%8E%8B/OUT-%E6%B1%89%E5%A0%A1%E7%8E%8B.jpg" alt="OUT-汉堡王.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-汉堡王.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 沙河地铁站冰粉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B2%99%E6%B2%B3%E5%9C%B0%E9%93%81%E7%AB%99%E5%86%B0%E7%B2%89/OUT-%E6%B2%99%E6%B2%B3%E5%9C%B0%E9%93%81%E7%AB%99%E5%86%B0%E7%B2%89.jpg" alt="OUT-沙河地铁站冰粉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-沙河地铁站冰粉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 沙河地铁站蛋包肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B2%99%E6%B2%B3%E5%9C%B0%E9%93%81%E7%AB%99%E8%9B%8B%E5%8C%85%E8%82%89/OUT-%E6%B2%99%E6%B2%B3%E5%9C%B0%E9%93%81%E7%AB%99%E8%9B%8B%E5%8C%85%E8%82%89.jpg" alt="OUT-沙河地铁站蛋包肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-沙河地铁站蛋包肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 河南烩面方便面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B2%B3%E5%8D%97%E7%83%A9%E9%9D%A2%E6%96%B9%E4%BE%BF%E9%9D%A2/OUT-%E6%B2%B3%E5%8D%97%E7%83%A9%E9%9D%A2%E6%96%B9%E4%BE%BF%E9%9D%A2.jpg" alt="OUT-河南烩面方便面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-河南烩面方便面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 海底捞生日宴</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B5%B7%E5%BA%95%E6%8D%9E%E7%94%9F%E6%97%A5%E5%AE%B4/OUT-%E6%B5%B7%E5%BA%95%E6%8D%9E%E7%94%9F%E6%97%A5%E5%AE%B4.jpg" alt="OUT-海底捞生日宴.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-海底捞生日宴.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 涞水小吃</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B6%9E%E6%B0%B4%E5%B0%8F%E5%90%83/OUT-%E6%B6%9E%E6%B0%B4%E5%B0%8F%E5%90%83%20%282%29.jpg" alt="OUT-涞水小吃 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-涞水小吃 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B6%9E%E6%B0%B4%E5%B0%8F%E5%90%83/OUT-%E6%B6%9E%E6%B0%B4%E5%B0%8F%E5%90%83.jpg" alt="OUT-涞水小吃.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-涞水小吃.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 清华南门茶话弄</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B8%85%E5%8D%8E%E5%8D%97%E9%97%A8%E8%8C%B6%E8%AF%9D%E5%BC%84/OUT-%E6%B8%85%E5%8D%8E%E5%8D%97%E9%97%A8%E8%8C%B6%E8%AF%9D%E5%BC%84.jpg" alt="OUT-清华南门茶话弄.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-清华南门茶话弄.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 清华汤面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B8%85%E5%8D%8E%E6%B1%A4%E9%9D%A2/OUT-%E6%B8%85%E5%8D%8E%E6%B1%A4%E9%9D%A2.jpg" alt="OUT-清华汤面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-清华汤面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 清华菜</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E6%B8%85%E5%8D%8E%E8%8F%9C/OUT-%E6%B8%85%E5%8D%8E%E8%8F%9C.jpg" alt="OUT-清华菜.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-清华菜.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 火烧夹肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%81%AB%E7%83%A7%E5%A4%B9%E8%82%89/OUT-%E7%81%AB%E7%83%A7%E5%A4%B9%E8%82%89.jpg" alt="OUT-火烧夹肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-火烧夹肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 火车方便面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%81%AB%E8%BD%A6%E6%96%B9%E4%BE%BF%E9%9D%A2/OUT-%E7%81%AB%E8%BD%A6%E6%96%B9%E4%BE%BF%E9%9D%A2.jpg" alt="OUT-火车方便面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-火车方便面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 火锅蘸料</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%81%AB%E9%94%85%E8%98%B8%E6%96%99/OUT-%E7%81%AB%E9%94%85%E8%98%B8%E6%96%99.jpg" alt="OUT-火锅蘸料.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-火锅蘸料.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 环球影城鸡腿</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%8E%AF%E7%90%83%E5%BD%B1%E5%9F%8E%E9%B8%A1%E8%85%BF/OUT-%E7%8E%AF%E7%90%83%E5%BD%B1%E5%9F%8E%E9%B8%A1%E8%85%BF.jpg" alt="OUT-环球影城鸡腿.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-环球影城鸡腿.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 环球猪肉面包</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%8E%AF%E7%90%83%E7%8C%AA%E8%82%89%E9%9D%A2%E5%8C%85/OUT-%E7%8E%AF%E7%90%83%E7%8C%AA%E8%82%89%E9%9D%A2%E5%8C%85.jpg" alt="OUT-环球猪肉面包.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-环球猪肉面包.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 环球饮食</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%8E%AF%E7%90%83%E9%A5%AE%E9%A3%9F/OUT-%E7%8E%AF%E7%90%83%E9%A5%AE%E9%A3%9F.jpg" alt="OUT-环球饮食.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-环球饮食.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 环球黄油啤酒</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%8E%AF%E7%90%83%E9%BB%84%E6%B2%B9%E5%95%A4%E9%85%92/OUT-%E7%8E%AF%E7%90%83%E9%BB%84%E6%B2%B9%E5%95%A4%E9%85%92.jpg" alt="OUT-环球黄油啤酒.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-环球黄油啤酒.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 生煎</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%94%9F%E7%85%8E/OUT-%E7%94%9F%E7%85%8E%20%281%29.jpg" alt="OUT-生煎 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-生煎 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%94%9F%E7%85%8E/OUT-%E7%94%9F%E7%85%8E.jpg" alt="OUT-生煎.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-生煎.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 米村拌饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%B1%B3%E6%9D%91%E6%8B%8C%E9%A5%AD/OUT-%E7%B1%B3%E6%9D%91%E6%8B%8C%E9%A5%AD.jpg" alt="OUT-米村拌饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-米村拌饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 米村拌饭聚餐</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%B1%B3%E6%9D%91%E6%8B%8C%E9%A5%AD%E8%81%9A%E9%A4%90/OUT-%E7%B1%B3%E6%9D%91%E6%8B%8C%E9%A5%AD%E8%81%9A%E9%A4%90.jpg" alt="OUT-米村拌饭聚餐.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-米村拌饭聚餐.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 米村拌饭鱿鱼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%B1%B3%E6%9D%91%E6%8B%8C%E9%A5%AD%E9%B1%BF%E9%B1%BC/OUT-%E7%B1%B3%E6%9D%91%E6%8B%8C%E9%A5%AD%E9%B1%BF%E9%B1%BC.jpg" alt="OUT-米村拌饭鱿鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-米村拌饭鱿鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 米线</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%B1%B3%E7%BA%BF/OUT-%E7%B1%B3%E7%BA%BF.jpg" alt="OUT-米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 紫光园京酱肉丝</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%B4%AB%E5%85%89%E5%9B%AD%E4%BA%AC%E9%85%B1%E8%82%89%E4%B8%9D/OUT-%E7%B4%AB%E5%85%89%E5%9B%AD%E4%BA%AC%E9%85%B1%E8%82%89%E4%B8%9D%20%281%29.jpg" alt="OUT-紫光园京酱肉丝 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-紫光园京酱肉丝 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E7%B4%AB%E5%85%89%E5%9B%AD%E4%BA%AC%E9%85%B1%E8%82%89%E4%B8%9D/OUT-%E7%B4%AB%E5%85%89%E5%9B%AD%E4%BA%AC%E9%85%B1%E8%82%89%E4%B8%9D.jpg" alt="OUT-紫光园京酱肉丝.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-紫光园京酱肉丝.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 肯德基儿童餐</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%82%AF%E5%BE%B7%E5%9F%BA%E5%84%BF%E7%AB%A5%E9%A4%90/OUT-%E8%82%AF%E5%BE%B7%E5%9F%BA%E5%84%BF%E7%AB%A5%E9%A4%90.jpg" alt="OUT-肯德基儿童餐.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-肯德基儿童餐.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 芫爆牛肚</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%8A%AB%E7%88%86%E7%89%9B%E8%82%9A/OUT-%E8%8A%AB%E7%88%86%E7%89%9B%E8%82%9A.jpg" alt="OUT-芫爆牛肚.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-芫爆牛肚.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 茶话弄</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%8C%B6%E8%AF%9D%E5%BC%84/OUT-%E8%8C%B6%E8%AF%9D%E5%BC%84.jpg" alt="OUT-茶话弄.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-茶话弄.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 蔡澜招牌菜</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%94%A1%E6%BE%9C%E6%8B%9B%E7%89%8C%E8%8F%9C/OUT-%E8%94%A1%E6%BE%9C%E6%8B%9B%E7%89%8C%E8%8F%9C.jpg" alt="OUT-蔡澜招牌菜.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-蔡澜招牌菜.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 蔡澜鲜虾包</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%94%A1%E6%BE%9C%E9%B2%9C%E8%99%BE%E5%8C%85/OUT-%E8%94%A1%E6%BE%9C%E9%B2%9C%E8%99%BE%E5%8C%85.jpg" alt="OUT-蔡澜鲜虾包.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-蔡澜鲜虾包.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 跳跳糖煎蛋</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%B7%B3%E8%B7%B3%E7%B3%96%E7%85%8E%E8%9B%8B/OUT-%E8%B7%B3%E8%B7%B3%E7%B3%96%E7%85%8E%E8%9B%8B.jpg" alt="OUT-跳跳糖煎蛋.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-跳跳糖煎蛋.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 迷你小汉堡</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E8%BF%B7%E4%BD%A0%E5%B0%8F%E6%B1%89%E5%A0%A1/OUT-%E8%BF%B7%E4%BD%A0%E5%B0%8F%E6%B1%89%E5%A0%A1.jpg" alt="OUT-迷你小汉堡.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-迷你小汉堡.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 金谷园葱麻鸡</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%87%91%E8%B0%B7%E5%9B%AD%E8%91%B1%E9%BA%BB%E9%B8%A1/OUT-%E9%87%91%E8%B0%B7%E5%9B%AD%E8%91%B1%E9%BA%BB%E9%B8%A1.jpg" alt="OUT-金谷园葱麻鸡.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-金谷园葱麻鸡.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 金谷园饺子</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%87%91%E8%B0%B7%E5%9B%AD%E9%A5%BA%E5%AD%90/OUT-%E9%87%91%E8%B0%B7%E5%9B%AD%E9%A5%BA%E5%AD%90.jpg" alt="OUT-金谷园饺子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-金谷园饺子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鲍师傅奶贝</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%B2%8D%E5%B8%88%E5%82%85%E5%A5%B6%E8%B4%9D/OUT-%E9%B2%8D%E5%B8%88%E5%82%85%E5%A5%B6%E8%B4%9D.jpg" alt="OUT-鲍师傅奶贝.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-鲍师傅奶贝.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鲍师傅糕点</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%B2%8D%E5%B8%88%E5%82%85%E7%B3%95%E7%82%B9/OUT-%E9%B2%8D%E5%B8%88%E5%82%85%E7%B3%95%E7%82%B9.jpg" alt="OUT-鲍师傅糕点.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-鲍师傅糕点.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣串串</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%BA%BB%E8%BE%A3%E4%B8%B2%E4%B8%B2/OUT-%E9%BA%BB%E8%BE%A3%E4%B8%B2%E4%B8%B2.jpg" alt="OUT-麻辣串串.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-麻辣串串.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 齐齐哈尔烤肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%BD%90%E9%BD%90%E5%93%88%E5%B0%94%E7%83%A4%E8%82%89/OUT-%E9%BD%90%E9%BD%90%E5%93%88%E5%B0%94%E7%83%A4%E8%82%89%20%281%29.jpg" alt="OUT-齐齐哈尔烤肉 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-齐齐哈尔烤肉 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%BD%90%E9%BD%90%E5%93%88%E5%B0%94%E7%83%A4%E8%82%89/OUT-%E9%BD%90%E9%BD%90%E5%93%88%E5%B0%94%E7%83%A4%E8%82%89%20%282%29.jpg" alt="OUT-齐齐哈尔烤肉 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-齐齐哈尔烤肉 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E6%A0%A1%E5%A4%96%E7%BE%8E%E9%A3%9F/%E9%BD%90%E9%BD%90%E5%93%88%E5%B0%94%E7%83%A4%E8%82%89/OUT-%E9%BD%90%E9%BD%90%E5%93%88%E5%B0%94%E7%83%A4%E8%82%89.jpg" alt="OUT-齐齐哈尔烤肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">OUT-齐齐哈尔烤肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 风味餐厅一层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 京麦肯</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E4%BA%AC%E9%BA%A6%E8%82%AF/FW1-%E4%BA%AC%E9%BA%A6%E8%82%AF.jpg" alt="FW1-京麦肯.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-京麦肯.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 京麦肯汉堡</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E4%BA%AC%E9%BA%A6%E8%82%AF%E6%B1%89%E5%A0%A1/FW1-%E4%BA%AC%E9%BA%A6%E8%82%AF%E6%B1%89%E5%A0%A1.jpg" alt="FW1-京麦肯汉堡.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-京麦肯汉堡.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 健康京麦肯</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E5%81%A5%E5%BA%B7%E4%BA%AC%E9%BA%A6%E8%82%AF/FW1-%E5%81%A5%E5%BA%B7%E4%BA%AC%E9%BA%A6%E8%82%AF.jpg" alt="FW1-健康京麦肯.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-健康京麦肯.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 拌面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E6%8B%8C%E9%9D%A2/FW1-%E6%8B%8C%E9%9D%A2.jpg" alt="FW1-拌面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-拌面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 拌饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E6%8B%8C%E9%A5%AD/FW1-%E6%8B%8C%E9%A5%AD.jpg" alt="FW1-拌饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-拌饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤盘饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW1-%E7%83%A4%E7%9B%98%E9%A5%AD%20%281%29.jpg" alt="FW1-烤盘饭 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤盘饭 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW1-%E7%83%A4%E7%9B%98%E9%A5%AD%20%282%29%20%281%29.jpg" alt="FW1-烤盘饭 (2) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤盘饭 (2) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW1-%E7%83%A4%E7%9B%98%E9%A5%AD%20%282%29.jpg" alt="FW1-烤盘饭 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤盘饭 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW1-%E7%83%A4%E7%9B%98%E9%A5%AD%20%283%29.jpg" alt="FW1-烤盘饭 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤盘饭 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW1-%E7%83%A4%E7%9B%98%E9%A5%AD.jpg" alt="FW1-烤盘饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤盘饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤鸭饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E9%B8%AD%E9%A5%AD/FW1-%E7%83%A4%E9%B8%AD%E9%A5%AD%20%282%29.jpg" alt="FW1-烤鸭饭 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤鸭饭 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E9%B8%AD%E9%A5%AD/FW1-%E7%83%A4%E9%B8%AD%E9%A5%AD.jpg" alt="FW1-烤鸭饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤鸭饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤鸭饭外卖</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E7%83%A4%E9%B8%AD%E9%A5%AD%E5%A4%96%E5%8D%96/FW1-%E7%83%A4%E9%B8%AD%E9%A5%AD%E5%A4%96%E5%8D%96.jpg" alt="FW1-烤鸭饭外卖.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-烤鸭饭外卖.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 自选拌面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E8%87%AA%E9%80%89%E6%8B%8C%E9%9D%A2/FW1-%E8%87%AA%E9%80%89%E6%8B%8C%E9%9D%A2%20%282%29.jpg" alt="FW1-自选拌面 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-自选拌面 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E8%87%AA%E9%80%89%E6%8B%8C%E9%9D%A2/FW1-%E8%87%AA%E9%80%89%E6%8B%8C%E9%9D%A2%20%283%29.jpg" alt="FW1-自选拌面 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-自选拌面 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%80%E5%B1%82/%E8%87%AA%E9%80%89%E6%8B%8C%E9%9D%A2/FW1-%E8%87%AA%E9%80%89%E6%8B%8C%E9%9D%A2.jpg" alt="FW1-自选拌面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW1-自选拌面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 风味餐厅三层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%89%E5%B1%82/%E5%B0%8F%E9%9D%A2/FW3-%E5%B0%8F%E9%9D%A2.jpg" alt="FW3-小面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW3-小面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤盘饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%89%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW3-%E7%83%A4%E7%9B%98%E9%A5%AD%20%281%29.jpg" alt="FW3-烤盘饭 (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW3-烤盘饭 (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%89%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW3-%E7%83%A4%E7%9B%98%E9%A5%AD%20%282%29%20%281%29.jpg" alt="FW3-烤盘饭 (2) (1).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW3-烤盘饭 (2) (1).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%89%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW3-%E7%83%A4%E7%9B%98%E9%A5%AD%20%282%29.jpg" alt="FW3-烤盘饭 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW3-烤盘饭 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%89%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW3-%E7%83%A4%E7%9B%98%E9%A5%AD%20%283%29.jpg" alt="FW3-烤盘饭 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW3-烤盘饭 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%B8%89%E5%B1%82/%E7%83%A4%E7%9B%98%E9%A5%AD/FW3-%E7%83%A4%E7%9B%98%E9%A5%AD.jpg" alt="FW3-烤盘饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW3-烤盘饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 风味餐厅二层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 小盘菜</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E5%B0%8F%E7%9B%98%E8%8F%9C/FW2-%E5%B0%8F%E7%9B%98%E8%8F%9C%20%282%29.jpg" alt="FW2-小盘菜 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-小盘菜 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E5%B0%8F%E7%9B%98%E8%8F%9C/FW2-%E5%B0%8F%E7%9B%98%E8%8F%9C%20%283%29.jpg" alt="FW2-小盘菜 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-小盘菜 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E5%B0%8F%E7%9B%98%E8%8F%9C/FW2-%E5%B0%8F%E7%9B%98%E8%8F%9C%20%284%29.jpg" alt="FW2-小盘菜 (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-小盘菜 (4).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E5%B0%8F%E7%9B%98%E8%8F%9C/FW2-%E5%B0%8F%E7%9B%98%E8%8F%9C%20%285%29.jpg" alt="FW2-小盘菜 (5).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-小盘菜 (5).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E5%B0%8F%E7%9B%98%E8%8F%9C/FW2-%E5%B0%8F%E7%9B%98%E8%8F%9C.jpg" alt="FW2-小盘菜.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-小盘菜.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 无骨烤鱼饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E6%97%A0%E9%AA%A8%E7%83%A4%E9%B1%BC%E9%A5%AD/FW2-%E6%97%A0%E9%AA%A8%E7%83%A4%E9%B1%BC%E9%A5%AD.jpg" alt="FW2-无骨烤鱼饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-无骨烤鱼饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤鱼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%83%A4%E9%B1%BC/FW2-%E7%83%A4%E9%B1%BC.jpg" alt="FW2-烤鱼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-烤鱼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 狮子头</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E7%8B%AE%E5%AD%90%E5%A4%B4/FW2-%E7%8B%AE%E5%AD%90%E5%A4%B4.jpg" alt="FW2-狮子头.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-狮子头.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 自选菜</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C/FW2-%E8%87%AA%E9%80%89%E8%8F%9C%20%282%29.jpg" alt="FW2-自选菜 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-自选菜 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C/FW2-%E8%87%AA%E9%80%89%E8%8F%9C%20%283%29.jpg" alt="FW2-自选菜 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-自选菜 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C/FW2-%E8%87%AA%E9%80%89%E8%8F%9C%20%284%29.jpg" alt="FW2-自选菜 (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-自选菜 (4).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C/FW2-%E8%87%AA%E9%80%89%E8%8F%9C%20%285%29.jpg" alt="FW2-自选菜 (5).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-自选菜 (5).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C/FW2-%E8%87%AA%E9%80%89%E8%8F%9C.jpg" alt="FW2-自选菜.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-自选菜.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 自选菜藕饼</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E8%87%AA%E9%80%89%E8%8F%9C%E8%97%95%E9%A5%BC/FW2-%E8%87%AA%E9%80%89%E8%8F%9C%E8%97%95%E9%A5%BC.jpg" alt="FW2-自选菜藕饼.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-自选菜藕饼.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 金汤米线</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%87%91%E6%B1%A4%E7%B1%B3%E7%BA%BF/FW2-%E9%87%91%E6%B1%A4%E7%B1%B3%E7%BA%BF.jpg" alt="FW2-金汤米线.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-金汤米线.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 银耳粥</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%93%B6%E8%80%B3%E7%B2%A5/FW2-%E9%93%B6%E8%80%B3%E7%B2%A5.jpg" alt="FW2-银耳粥.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-银耳粥.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 锡纸粉丝肥牛</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%94%A1%E7%BA%B8%E7%B2%89%E4%B8%9D%E8%82%A5%E7%89%9B/FW2-%E9%94%A1%E7%BA%B8%E7%B2%89%E4%B8%9D%E8%82%A5%E7%89%9B.jpg" alt="FW2-锡纸粉丝肥牛.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-锡纸粉丝肥牛.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 麻辣烫</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%8C%E5%B1%82/%E9%BA%BB%E8%BE%A3%E7%83%AB/FW2-%E9%BA%BB%E8%BE%A3%E7%83%AB.jpg" alt="FW2-麻辣烫.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW2-麻辣烫.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 风味餐厅五层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤串</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%83%A4%E4%B8%B2/FW5-%E7%83%A4%E4%B8%B2.jpg" alt="FW5-烤串.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW5-烤串.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤羊肉串</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E7%83%A4%E7%BE%8A%E8%82%89%E4%B8%B2/FW5-%E7%83%A4%E7%BE%8A%E8%82%89%E4%B8%B2.jpg" alt="FW5-烤羊肉串.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW5-烤羊肉串.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 锅包肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%94%85%E5%8C%85%E8%82%89/FW5-%E9%94%85%E5%8C%85%E8%82%89.jpg" alt="FW5-锅包肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW5-锅包肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸭架汤</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E4%BA%94%E5%B1%82/%E9%B8%AD%E6%9E%B6%E6%B1%A4/FW5-%E9%B8%AD%E6%9E%B6%E6%B1%A4.jpg" alt="FW5-鸭架汤.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW5-鸭架汤.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dining-hall">
+                    <h3 class="dining-hall-title">📍 风味餐厅四层</h3>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 水煮肉</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E6%B0%B4%E7%85%AE%E8%82%89/FW4-%E6%B0%B4%E7%85%AE%E8%82%89.jpg" alt="FW4-水煮肉.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-水煮肉.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 烤鸭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E7%83%A4%E9%B8%AD/FW4-%E7%83%A4%E9%B8%AD.jpg" alt="FW4-烤鸭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-烤鸭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 煲饭</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E7%85%B2%E9%A5%AD/FW4-%E7%85%B2%E9%A5%AD.jpg" alt="FW4-煲饭.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-煲饭.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 饺子</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%A5%BA%E5%AD%90/FW4-%E9%A5%BA%E5%AD%90.jpg" alt="FW4-饺子.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-饺子.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鲍汁肥牛</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B/FW4-%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B%20%282%29.jpg" alt="FW4-鲍汁肥牛 (2).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-鲍汁肥牛 (2).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B/FW4-%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B%20%283%29.jpg" alt="FW4-鲍汁肥牛 (3).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-鲍汁肥牛 (3).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B/FW4-%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B%20%284%29.jpg" alt="FW4-鲍汁肥牛 (4).jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-鲍汁肥牛 (4).jpg</div>
+                            </div>
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B/FW4-%E9%B2%8D%E6%B1%81%E8%82%A5%E7%89%9B.jpg" alt="FW4-鲍汁肥牛.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-鲍汁肥牛.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish-section">
+                        <h4 class="dish-title">🍴 鸡块面</h4>
+                        <div class="photo-grid">
+                            <div class="photo-item">
+                                <img src="Photos/%E6%B2%99%E6%B2%B3%E6%A0%A1%E5%8C%BA/%E9%A3%8E%E5%91%B3%E9%A4%90%E5%8E%85%E5%9B%9B%E5%B1%82/%E9%B8%A1%E5%9D%97%E9%9D%A2/FW4-%E9%B8%A1%E5%9D%97%E9%9D%A2.jpg" alt="FW4-鸡块面.jpg" onclick="openLightbox(this.src)">
+                                <div class="photo-caption">FW4-鸡块面.jpg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>Made with ❤️ for BUPT Campus Community</p>
+            <p>Special thanks to QIN SHUANG for her unwavering support</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <a href="https://github.com/coffee3699/BUPT-Campus-Food-Photo" style="color: #667eea; text-decoration: none;">
+                    View on GitHub
+                </a>
+            </p>
+        </footer>
+    </div>
+    
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+        <span class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)">&#10094;</span>
+        <img id="lightbox-img" class="lightbox-content" src="" alt="">
+        <span class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)">&#10095;</span>
+    </div>
+    
+    <script>
+        let allImages = [];
+        let currentImageIndex = 0;
+        
+        // Collect all images on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.photo-item img');
+            allImages = Array.from(images).map(img => img.src);
+        });
+        
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            currentImageIndex = allImages.indexOf(src);
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLightbox(event) {
+            if (event.target.id === 'lightbox' || event.target.classList.contains('lightbox-close')) {
+                const lightbox = document.getElementById('lightbox');
+                lightbox.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        function navigateLightbox(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex < 0) {
+                currentImageIndex = allImages.length - 1;
+            } else if (currentImageIndex >= allImages.length) {
+                currentImageIndex = 0;
+            }
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = allImages[currentImageIndex];
+            event.stopPropagation();
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            const lightbox = document.getElementById('lightbox');
+            if (lightbox.classList.contains('active')) {
+                if (event.key === 'Escape') {
+                    lightbox.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                } else if (event.key === 'ArrowLeft') {
+                    navigateLightbox(-1);
+                } else if (event.key === 'ArrowRight') {
+                    navigateLightbox(1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
